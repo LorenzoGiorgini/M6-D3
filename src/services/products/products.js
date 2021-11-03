@@ -10,6 +10,20 @@ const { Op } = sequelize
 const router = express.Router()
 
 
+
+const searchByCategoryAndName = async (field , query) => {
+    const product = await products.findAll({
+        where: {
+            [field] : {
+                [Op.like]: `%${query}%`
+            }
+        },
+        include: reviews
+    })
+    return product
+}
+
+
 router.route("/")
                 .post(async (req, res) => {
                     try {
@@ -21,31 +35,17 @@ router.route("/")
                 })
                 .get(async (req, res) => {
                     try {
-                        if(req.query.category || req.query.name){
-                            if(req.query.category){
-                                const product = await products.findAll({
-                                    where: {
-                                        category : {
-                                            [Op.like]: `%${req.query.category}%`
-                                        }
-                                    },
-                                    include: reviews
-                                })
-                                
-                                res.status(200).send({success: true, data: product})
-                            } else {
-                                const product = await products.findAll({
-                                    where: {
-                                        name : {
-                                            [Op.like]: `%${req.query.name}%`
-                                        }
-                                    },
-                                    include: reviews
-                                })
-                                
-                                res.status(200).send({success: true, data: product})
-                            }
-                        } if(req.query.price) {
+                        if(req.query.category) {
+                            const product = await searchByCategoryAndName("category", req.query.category)
+                            
+                            res.status(200).send({success: true, data: product})
+                        } 
+                        if(req.query.name) {
+                            const product = await searchByCategoryAndName("name" , req.query.name)
+                            
+                            res.status(200).send({success: true, data: product})
+                        }
+                        if(req.query.price) {
                             const getAllByPrice = await products.findAll({
                                 where:{
                                     price: req.query.price
@@ -53,10 +53,14 @@ router.route("/")
                                 include: reviews
                             })
                             res.status(200).send({success: true, data: getAllByPrice})
-                        } else {
-                            const getAllByPrice = await products.findAll({include: reviews})
-                            res.status(200).send({success: true, data: getAllByPrice})
                         }
+                            const getAllByPrice = await products.findAll({
+                                include: reviews,
+                                order: [
+                                    ['id', 'ASC']
+                                ]
+                            })
+                            res.status(200).send({success: true, data: getAllByPrice})
                     } catch (error) {
                         res.status(404).send({success: false, message: error.message})
                     }
