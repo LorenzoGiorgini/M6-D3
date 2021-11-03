@@ -3,9 +3,22 @@ import models from "../../db/models/index.js"
 const { products , reviews } = models
 import sequelize from "sequelize"
 
-const {Op} = sequelize
+const { Op } = sequelize
 
 const router = express.Router()
+
+
+const searchByCategoryOrName = async(field) => {
+    const product = await products.findAll({
+        where: {
+            field: {
+                [Op.like]: `%${req.query.field}%`
+            }
+        },
+        include: reviews
+    })
+    res.status(200).send({success: true, data: product})
+}
 
 
 router.route("/")
@@ -19,14 +32,24 @@ router.route("/")
                 })
                 .get(async (req, res) => {
                     try {
-                        console.log(req.query)
-                        const getAllByPrice = await products.findAll({
-                            where: req.query.price?  {
-                                price: req.query.price
-                            } : {},
-                            include: reviews
-                        })
-                        res.status(200).send({success: true, data: getAllByPrice})
+                        if(req.query.category || req.query.name){
+                            if(req.query.category){
+                                await searchByCategoryOrName(category)
+                            } else {
+                                await searchByCategoryOrName(category)
+                            }
+                        } if(req.query.price) {
+                            const getAllByPrice = await products.findAll({
+                                where:{
+                                    price: req.query.price
+                                },
+                                include: reviews
+                            })
+                            res.status(200).send({success: true, data: getAllByPrice})
+                        } else {
+                            const getAllByPrice = await products.findAll({include: reviews})
+                            res.status(200).send({success: true, data: getAllByPrice})
+                        }
                     } catch (error) {
                         res.status(404).send({success: false, message: error.message})
                     }

@@ -4,9 +4,9 @@ const { PGDATABASE , PGUSER , PGPASSWORD ,  PGHOST , PGPORT} = process.env
 
 
 const sequelize = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
-    host: PGHOST,
-    port: PGPORT,
-    dialect: 'postgres'
+  host: PGHOST,
+  port: PGPORT,
+  dialect: 'postgres'
 });
 
 
@@ -14,7 +14,7 @@ const sequelize = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
 //this function sync sequelize with the database
 export const connectDB = async () => {
     try {
-      await sequelize.sync();
+      await sequelize.sync({logging: false});
     } catch (error) {
       console.log(error);
     }
