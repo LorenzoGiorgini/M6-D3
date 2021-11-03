@@ -1,24 +1,13 @@
 import express from "express";
 import models from "../../db/models/index.js"
 const { products , reviews } = models
-import sequelize from "sequelize"
 
+
+//Imported sequelize and Op to filter by category and name
+import sequelize from "sequelize"
 const { Op } = sequelize
 
 const router = express.Router()
-
-
-const searchByCategoryOrName = async(field) => {
-    const product = await products.findAll({
-        where: {
-            field: {
-                [Op.like]: `%${req.query.field}%`
-            }
-        },
-        include: reviews
-    })
-    res.status(200).send({success: true, data: product})
-}
 
 
 router.route("/")
@@ -34,9 +23,27 @@ router.route("/")
                     try {
                         if(req.query.category || req.query.name){
                             if(req.query.category){
-                                await searchByCategoryOrName(category)
+                                const product = await products.findAll({
+                                    where: {
+                                        category : {
+                                            [Op.like]: `%${req.query.category}%`
+                                        }
+                                    },
+                                    include: reviews
+                                })
+                                
+                                res.status(200).send({success: true, data: product})
                             } else {
-                                await searchByCategoryOrName(category)
+                                const product = await products.findAll({
+                                    where: {
+                                        name : {
+                                            [Op.like]: `%${req.query.name}%`
+                                        }
+                                    },
+                                    include: reviews
+                                })
+                                
+                                res.status(200).send({success: true, data: product})
                             }
                         } if(req.query.price) {
                             const getAllByPrice = await products.findAll({
