@@ -1,7 +1,9 @@
 import express from "express";
 import models from "../../db/models/index.js"
 const { products , reviews } = models
+import sequelize from "sequelize"
 
+const {Op} = sequelize
 
 const router = express.Router()
 
@@ -17,8 +19,14 @@ router.route("/")
                 })
                 .get(async (req, res) => {
                     try {
-                        const getAll = await products.findAll({include: reviews})
-                        res.status(200).send({success: true, data: getAll})
+                        console.log(req.query)
+                        const getAllByPrice = await products.findAll({
+                            where: req.query.price?  {
+                                price: req.query.price
+                            } : {},
+                            include: reviews
+                        })
+                        res.status(200).send({success: true, data: getAllByPrice})
                     } catch (error) {
                         res.status(404).send({success: false, message: error.message})
                     }
