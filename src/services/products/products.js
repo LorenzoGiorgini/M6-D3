@@ -1,6 +1,6 @@
 import express from "express";
 import models from "../../db/models/index.js"
-const { products , reviews } = models
+const { Products , Reviews , Categories , Users , ProductCategory } = models
 
 
 //Imported sequelize and Op to filter by category and name
@@ -12,13 +12,13 @@ const router = express.Router()
 
 
 const searchByCategoryAndName = async (field , query) => {
-    const product = await products.findAll({
+    const product = await Products.findAll({
         where: {
             [field] : {
                 [Op.like]: `%${query}%`
             }
         },
-        include: reviews
+        include: Reviews
     })
     return product
 }
@@ -27,7 +27,10 @@ const searchByCategoryAndName = async (field , query) => {
 router.route("/")
                 .post(async (req, res) => {
                     try {
-                        const newProduct = await products.create(req.body)
+                        const newProduct = await Products.create(req.body);
+                        
+                        await ProductCategory.create({productId: newProduct.id , categoryId: req.body.categoryId})
+
                         res.status(201).send({success: true, data: newProduct})
                     } catch (error) {
                         res.status(400).send({success: false, message: error.message})
@@ -46,21 +49,21 @@ router.route("/")
                             res.status(200).send({success: true, data: product})
                         }
                         if(req.query.price) {
-                            const getAllByPrice = await products.findAll({
+                            const getAllByPrice = await Products.findAll({
                                 where:{
                                     price: req.query.price
                                 },
-                                include: reviews
+                                include: Reviews
                             })
                             res.status(200).send({success: true, data: getAllByPrice})
                         }
-                            const getAllByPrice = await products.findAll({
-                                include: reviews,
+                            const getAllProducts = await Products.findAll({
+                                include: [Reviews, Categories],
                                 order: [
-                                    ['id', 'ASC']
+                                    ['createdAt', 'ASC']
                                 ]
                             })
-                            res.status(200).send({success: true, data: getAllByPrice})
+                            res.status(200).send({success: true, data: getAllProducts})
                     } catch (error) {
                         res.status(404).send({success: false, message: error.message})
                     }
@@ -69,7 +72,7 @@ router.route("/")
 router.route("/:productId")
                 .put(async (req, res) => {
                     try {
-                        const updatedProduct = await products.update(req.body, {
+                        const updatedProduct = await Products.update(req.body, {
                             where: {
                                 id: req.params.productId
                             },
@@ -82,7 +85,7 @@ router.route("/:productId")
                 })
                 .delete(async (req, res) => {
                     try {
-                        const deleteProduct = await products.destroy({
+                        const deleteProduct = await Products.destroy({
                             where: {
                                 id: req.params.productId
                             }
@@ -94,11 +97,13 @@ router.route("/:productId")
                 })
                 .get(async (req, res) => {
                     try {
-                        const getById = await products.findByPk(req.params.productId)
+                        const getById = await Products.findByPk(req.params.productId)
                         res.status(200).send({success: true, data: getById})
                     } catch (error) {
                         res.status(404).send({success: false, message: error.message})
                     }
                 })
+
+
 
 export default router

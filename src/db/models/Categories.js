@@ -3,22 +3,20 @@ import s from "sequelize"
 const { DataTypes } = s
 
 
-const Reviews = sequelize.define('reviews', {
+
+const Categories = sequelize.define("categories" , {
     id: {
         type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4,
         allowNull: false
     },
-    text: {
-        type: DataTypes.TEXT,
-        allowNull: false
-    },
-    username: {
+    name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
     }
+},{
+    timestamps: false
 })
 
-
-export default Reviews
+export default Categories

@@ -1,6 +1,6 @@
 import express from "express";
 import models from "../../db/models/index.js"
-const { products , reviews } = models
+const { Products , Reviews } = models
 
 
 const router = express.Router()
@@ -9,7 +9,7 @@ const router = express.Router()
 router.route("/")
                 .post(async (req, res) => {
                     try {
-                        const newReview = await reviews.create(req.body)
+                        const newReview = await Reviews.create(req.body)
                         res.status(201).send({success: true, data: newReview})
                     } catch (error) {
                         res.status(400).send({success: false, message: error.message})
@@ -17,19 +17,20 @@ router.route("/")
                 })
                 .get(async (req, res) => {
                     try {
-                        const getAll = await reviews.findAll()
+                        const getAll = await Reviews.findAll()
                         res.status(200).send({success: true, data: getAll})
                     } catch (error) {
                         res.status(404).send({success: false, message: error.message})
                     }
                 })
 
-router.route("/:reviewsId")
+                
+router.route("/:ReviewsId")
                 .put(async (req, res) => {
                     try {
-                        const updatedReviews = await reviews.update(req.body, {
+                        const updatedReviews = await Reviews.update(req.body, {
                             where: {
-                                id: req.params.reviewsId
+                                id: req.params.ReviewsId
                             },
                             returning: true
                         })
@@ -40,9 +41,9 @@ router.route("/:reviewsId")
                 })
                 .delete(async (req, res) => {
                     try {
-                        const deleteReview = await reviews.destroy({
+                        const deleteReview = await Reviews.destroy({
                             where: {
-                                id: req.params.reviewsId
+                                id: req.params.ReviewsId
                             }
                         })
                         res.status(204).send({success: true, message: "Product deleted"})
@@ -52,11 +53,12 @@ router.route("/:reviewsId")
                 })
                 .get(async (req, res) => {
                     try {
-                        const getById = await reviews.findByPk(req.params.reviewsId)
+                        const getById = await Reviews.findByPk(req.params.ReviewsId)
                         res.status(200).send({success: true, data: getById})
                     } catch (error) {
                         res.status(404).send({success: false, message: error.message})
                     }
                 })
+
 
 export default router

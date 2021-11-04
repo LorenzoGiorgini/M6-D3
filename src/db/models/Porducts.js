@@ -3,17 +3,14 @@ import s from "sequelize"
 const { DataTypes } = s
 
 
-const products = sequelize.define('products', {
+const Products = sequelize.define('products', {
     id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
         primaryKey: true,
-        autoIncrement: true
-    },
-    name: {
-        type: DataTypes.STRING,
+        defaultValue: DataTypes.UUIDV4,
         allowNull: false
     },
-    category: {
+    name: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -28,4 +25,4 @@ const products = sequelize.define('products', {
 })
 
 
-export default products
+export default Products
