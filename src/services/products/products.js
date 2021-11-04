@@ -58,10 +58,8 @@ router.route("/")
                             res.status(200).send({success: true, data: getAllByPrice})
                         }
                             const getAllProducts = await Products.findAll({
-                                include: [Reviews, Categories],
-                                order: [
-                                    ['createdAt', 'ASC']
-                                ]
+                                include: [{ model: Categories, through: { attributes: [] } }, Reviews],
+                                order: [["createdAt", "ASC"]],
                             })
                             res.status(200).send({success: true, data: getAllProducts})
                     } catch (error) {

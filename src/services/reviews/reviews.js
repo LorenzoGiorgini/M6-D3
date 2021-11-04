@@ -1,6 +1,6 @@
 import express from "express";
 import models from "../../db/models/index.js"
-const { Products , Reviews } = models
+const { Products , Reviews, Users } = models
 
 
 const router = express.Router()
@@ -9,7 +9,13 @@ const router = express.Router()
 router.route("/")
                 .post(async (req, res) => {
                     try {
-                        const newReview = await Reviews.create(req.body)
+                        const newReview = await Reviews.create({
+                            text: req.body.text,
+                            username: req.body.username,
+                            userId: req.body.userId,
+                            productId: req.body.productId
+                        })
+
                         res.status(201).send({success: true, data: newReview})
                     } catch (error) {
                         res.status(400).send({success: false, message: error.message})
@@ -17,7 +23,12 @@ router.route("/")
                 })
                 .get(async (req, res) => {
                     try {
-                        const getAll = await Reviews.findAll()
+                        const getAll = await Reviews.findAll({
+                            include: [Users],
+                            attributes: {
+                                exclude: ["createdAt", "updatedAt"]
+                            }
+                        })
                         res.status(200).send({success: true, data: getAll})
                     } catch (error) {
                         res.status(404).send({success: false, message: error.message})

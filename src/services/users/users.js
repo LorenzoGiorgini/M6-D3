@@ -11,7 +11,12 @@ const router = express.Router()
 router.route("/")
                 .get(async (req, res) => {
                     try {
-                        const user = await Users.findAll({include: [Reviews]})
+                        const user = await Users.findAll({
+                            include: [Reviews],
+                            attributes: {
+                                exclude: ["createdAt", "updatedAt"]
+                            }
+                        })
                         res.status(200).send({success: true, data: user})
                     } catch (error) {
                         res.status(400).send({success: false, message: error.message})
@@ -30,7 +35,7 @@ router.route("/")
 router.route("/:userId")
                 .get(async (req, res) => {
                     try {
-                        const user = await Users.findByPk(req.params.userId)
+                        const user = await Users.findAll({where: {id: req.params.userId}, include: [Reviews]})
                         res.status(200).send({success: true, data: user})
                     } catch (error) {
                         res.status(400).send({success: false, message: error.message})
