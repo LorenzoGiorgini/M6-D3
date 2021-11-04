@@ -26,8 +26,7 @@ const Users = sequelize.define("users",{
           isEmail: true,
         }
       }
-    }
-)
+})
 
 
 export default Users
