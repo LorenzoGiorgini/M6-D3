@@ -31,7 +31,8 @@ router.route("/")
                         })
                         res.status(200).send({success: true, data: getAll})
                     } catch (error) {
-                        res.status(404).send({success: false, message: error.message})
+                        console.log(error)
+                        res.status(404).send({success: false, message: error})
                     }
                 })
 

@@ -8,6 +8,7 @@ import usersRoutes from "./services/users/users.js"
 import productsRoutes from "./services/products/products.js"
 import reviewsRoutes from "./services/reviews/reviews.js"
 import categoriesRoutes from "./services/categories/categories.js"
+import shoppingCartRoutes from "./services/shopping_cart/shopping_cart.js"
 
 
 const server = express();
@@ -25,6 +26,8 @@ server.use("/products", productsRoutes)
 server.use("/reviews", reviewsRoutes)
 
 server.use("/categories" , categoriesRoutes)
+
+server.use("/shoppingCart" , shoppingCartRoutes)
 
 //errorHandlers middleware
 
