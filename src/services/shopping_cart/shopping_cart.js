@@ -40,7 +40,8 @@ router.route("/")
                         const shoppingCart = await Shopping_cart.findAll({include: [{model: Products}]})
                         res.status(200).send({success: true, data: shoppingCart})
                     } catch (error) {
-                        res.status(500).send({success: false, error: error.message})
+
+                        res.status(404).send({success: false, error: error.message})
                     }
                 })
 

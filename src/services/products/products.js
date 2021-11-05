@@ -1,6 +1,6 @@
 import express from "express";
 import models from "../../db/models/index.js"
-const { Products , Reviews , Categories , Users , ProductCategory } = models
+const { Products , Reviews , Categories , ProductCategory } = models
 
 
 //Imported sequelize and Op to filter by category and name
@@ -9,19 +9,6 @@ const { Op } = sequelize
 
 const router = express.Router()
 
-
-
-const searchByCategoryAndName = async (field , query) => {
-    const product = await Products.findAll({
-        where: {
-            [field] : {
-                [Op.like]: `%${query}%`
-            }
-        },
-        include: Reviews
-    })
-    return product
-}
 
 
 router.route("/")
@@ -38,30 +25,31 @@ router.route("/")
                 })
                 .get(async (req, res) => {
                     try {
-                        if(req.query.category) {
-                            const product = await searchByCategoryAndName("category", req.query.category)
-                            
-                            res.status(200).send({success: true, data: product})
-                        } 
-                        if(req.query.name) {
-                            const product = await searchByCategoryAndName("name" , req.query.name)
-                            
-                            res.status(200).send({success: true, data: product})
-                        }
-                        if(req.query.price) {
-                            const getAllByPrice = await Products.findAll({
-                                where:{
-                                    price: req.query.price
+                        const getAllProducts = await Products.findAndCountAll({
+                        include: [{ 
+                                model: Categories ,
+                                where: { 
+                                    ...(req.query.category && {
+                                            name: [req.query.category]
+                                        }), 
                                 },
-                                include: Reviews
+                                through: { attributes: [] } 
+                            }, Reviews
+                        ] , order: [["createdAt", "ASC"]],
+                        ...(req.query.size && req.query.page && {
+                            limit: req.query.size,
+                            offset: parseInt(req.query.size * req.query.page),
+                        })
+                        
+                    })
+                        res.status(200).send({
+                            success: true, 
+                            data: getAllProducts,
+                            ...(req.query.size && req.query.page && {
+                                total: getAllProducts.count,
+                                pages: Math.ceil(getAllProducts.count / req.query.size),
                             })
-                            res.status(200).send({success: true, data: getAllByPrice})
-                        }
-                            const getAllProducts = await Products.findAll({
-                                include: [{ model: Categories, through: { attributes: [] } }, Reviews],
-                                order: [["createdAt", "ASC"]],
-                            })
-                            res.status(200).send({success: true, data: getAllProducts})
+                        })
                     } catch (error) {
                         res.status(404).send({success: false, message: error.message})
                     }
