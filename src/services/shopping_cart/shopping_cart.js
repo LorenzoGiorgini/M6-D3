@@ -21,13 +21,12 @@ router.route("/")
                     
                         
                         if(alreadyExist.length > 0) {
-                            console.log("here")
-
+                        
                             const exist = await Shopping_cart.update({quantity: alreadyExist[0].quantity + 1}, {where: {productId: productId}})
 
                             res.status(201).send({success: true, data: exist})
                         } else {
-                            console.log("here but in else")
+                            
                             const dontExists = await Shopping_cart.create({productId: productId, quantity: 1})
 
                             res.status(201).send({success: true, data: dontExists})
