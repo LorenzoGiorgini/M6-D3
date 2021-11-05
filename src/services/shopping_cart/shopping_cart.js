@@ -37,7 +37,7 @@ router.route("/")
                 })
                 .get(async (req, res) => {
                     try {
-                        const shoppingCart = await Shopping_cart.findAll({include: [{model: Products}]})
+                        const shoppingCart = await Shopping_cart.findAll({include: [{model: Products}], order: [["createdAt", "ASC"]]})
                         res.status(200).send({success: true, data: shoppingCart})
                     } catch (error) {
 

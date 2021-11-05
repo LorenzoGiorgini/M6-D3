@@ -30,12 +30,22 @@ router.route("/")
                                 model: Categories ,
                                 where: { 
                                     ...(req.query.category && {
-                                            name: [req.query.category]
+                                            name: req.query.category
                                         }), 
                                 },
                                 through: { attributes: [] } 
-                            }, Reviews
-                        ] , order: [["createdAt", "ASC"]],
+                            }, Reviews] , 
+                            order: [["createdAt", "ASC"]],
+                            where: {
+                                ...(req.query.price && {
+                                    price: req.query.price
+                                }), 
+                                ...(req.query.name && {
+                                    name: {
+                                        [Op.iLike]: `%${req.query.name}%`
+                                    }
+                                }), 
+                            },
                         ...(req.query.size && req.query.page && {
                             limit: req.query.size,
                             offset: parseInt(req.query.size * req.query.page),
